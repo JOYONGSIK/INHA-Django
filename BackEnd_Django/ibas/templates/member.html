@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{# 현재 회원의 정보를 비밀번호 빼고 출력해주는 for문. #}
+{% for item in members %}
+    {{ item.mem_name }} {# 이름 #}
+    {{ item.mem_email }} {# 이메일 #}
+    {{ item.stu_nem }} {# 학번 #}
+    {{ item.mem_phone }} {# 핸드폰번호 #}
+    {{ item.address }} {# 주소 #}
+    <button type="button" onclick="return confirm('정말 삭제하시겠습니까?')"> {# 제명하고 싶은 사람이 있을 경우, 클릭하면 member-delete로 넘어감. #}
+        <!-- onclick 에 return confirm 을 걸어줄 수도 있음.-->
+        <a href="{% url 'member-delete' member_no=item.mem_no %}" style="text-decoration: none; color: black">제명</a>
+    </button>
+    <br/>
+{% endfor %}
+
+<!-- 페이지 이동하는 코드 -->
+<span>
+        {% if members.has_previous %}
+            <!-- 현재 페이지, 전 페이지가 있는지 리턴해주는 함수 -->
+            <a href="?page=1">&laquo;</a>
+            <a href="?page={{ members.previous_page_number }}"> {{ members.previous_page_number }}</a>
+        {% endif %}
+
+    <span>
+        {{ members.number }}
+    </span>
+
+    <span>
+        {% if members.has_next %}
+            <a href="?page={{ members.next_page_number }}"> {{ members.next_page_number }}</a>
+            <a href="?page={{ members.paginator.num_pages }}">&raquo;</a>
+        {% endif %}
+    </span>
+    </span>
+<br><a href="{% url 'main' %}"><button type="button">뒤로가기</button></a>
+</body>
+</html>

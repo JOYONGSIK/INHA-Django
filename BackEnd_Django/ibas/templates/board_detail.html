@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!-- 클릭하고 들어간 글 내용 출력문 -->
+작성자 : {{ board_name }} <br>
+제목 : {{ content.board_main }} <br>
+내용 : {{ content.board_content }} <br>
+작성 시간 : {{ content.created_time }} <br><br>
+<!-- 밑부터 댓글에 관해서 출력문 -->
+댓글창<br><br>
+{% for rev in reviews %} {# 댓글 있는거 가져온다. #}
+    {% for mem in MemberInfo.values %}   {# 회원값과 리뷰값을 가져와서 비교를 함 #}
+        {% if mem.mem_no == rev.mem_no %} {# 만약, 댓글의 회원번호와 회원의 회원번호가 같으면 이름과 댓글 출력 #}
+            {{ mem.mem_name }} :
+            {{ rev.review_comment }}
+
+            {% if rev.mem_no == loginMem %} {# 현재 세션이 댓글의 회원번호와 같을 경우 밑을 출력해준다. #}
+                <button type="button" onclick="return confirm('정말 삭제하시겠습니까?')">
+                <!-- onclick 에 return confirm 을 걸어줄 수도 있음. 삭제 확인-->
+                <a href="{% url 'review_delete' board_name=board_name board_no=board_no review_no=rev.review_no %}" style="text-decoration: none; color: black">삭제</a>
+                {# 삭제로 연결되는 버튼, 파라미터는 3개를 보낸다. urls.py에서 확인 name:review_delete와 연결 #}
+                </button>
+
+                <button type="button" onclick="return confirm('수정하시겠습니까?')">
+                <a href="{% url 'review_update' board_name=board_name board_no=board_no review_no=rev.review_no %}" style="text-decoration: none; color: black">수정</a>
+                {# 수정로 연결되는 버튼, 파라미터는 3개를 보낸다. urls.py에서 확인 name:review_update와 연결 #}
+                </button>
+
+            {% elif admin == 0 %} {# 관리자일 경우, 모든 사람의 댓글을 삭제할 권리가 있음.#}
+                {# 위의 if문과 다른점은, admin이 0일 경우 삭제버튼이 모든 댓글에 출력이 되게끔 함. #}
+                <button type="button" onclick="return confirm('정말 삭제하시겠습니까?')">
+                <!-- onclick 에 return confirm 을 걸어줄 수도 있음. 삭제 확인-->
+                <a href="{% url 'review_delete' board_name=board_name board_no=board_no review_no=rev.review_no %}" style="text-decoration: none; color: black">삭제</a>
+                {# 수정로 연결되는 버튼, 파라미터는 3개를 보낸다. urls.py에서 확인 name:review_delete와 연결 #}
+                </button>
+            {% endif %} <br>
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+
+{# ################## 밑은 댓글쓰기 창 만드는 곳 ##################### #}
+
+{% if member == 0 or admin == 0 %} {# 멤버나 관리자의 값이 0인 경우는 로그인 한 경우이다. 댓글을 달 수 있음. #}
+    <form action="{% url 'review_create' board_name=board_name board_no=board_no %}" method="POST">
+    {# 댓글을 쓰기 위해서는 현재의 작성자, 게시글번호를 파라미터로 받아야함. urls.py에 들어가면 int:board_no, str:board_name으로 선언을 해놓았음. 변경시 오류나옴 #}
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }} {# forms.py에 있는 review 출력함 #}
+    </table>
+    <input type="submit" value="댓글 쓰기">
+{% endif %}
+<a href="{% url 'board' %}"><button type="button">뒤로가기</button></a> {# 뒤로가기 버튼, 게시판으로 이동한다 #}
+<input type="hidden" name="board_no" value='{{ board_no }}'> {# forms.hiddenInput의 값을 넘겨주기 위함 #}
+<input type="hidden" name="mem_no" value='{{ loginMem }}'> {# forms.hiddenInput의 값을 넘겨주기 위함 #}
+</form>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="{% url 'login' %}" method="POST"> {# 로그인 form을 들고온다. forms.py에서 loginForm을 끌고옴 #}
+    {% csrf_token %} {# POST #}
+    <table>
+        {{ form.as_table }}  {# 로그인 form을 들고온다. forms.py에서 loginForm을 끌고옴 #}
+        {% if not_login == 0 %} {# 로그인이 안될경우 not_login : 0 이라는 값을 주었다. 로그인이 되지 않을 경우 알람을 띄운다. #}
+            <script>alert('이메일 혹은 비밀번호가 일치하지 않습니다.')</script>
+            {# 이메일 혹은 비밀번호가 일치하지 않는다고 해야 아이디 존재여부를 알 수 없다. 수정X #}
+        {% endif %}
+        <tr>
+            <th>
+                <input type="submit" value="로그인">
+                <a href="{% url 'main' %}"><button type="button">뒤로가기</button></a> {# 단순 뒤로가기 버튼. #}
+            </th>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

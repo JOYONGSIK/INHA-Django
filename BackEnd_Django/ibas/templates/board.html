@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% for cont in content %} {# 게시글 가져오는 for문 #}
+
+    {% for mem in MemberInfo %} {# 참조키 맞는지 확인 #}
+        {% if cont.mem_no.pk == mem.mem_no %}
+            <a href="{% url 'board_detail' board_no=cont.board_no board_name=mem.mem_name %}">{{ cont.board_main }}</a> {# 제목 #} //
+            {{ mem.mem_name }} // {# 맞으면 이름 #}
+        {% endif %}
+    {% endfor %}
+
+    작성시간 : {{ cont.created_time }} {# 작성시간 #}
+
+    {#  여기서부터 삭제 버튼 구현   style은 그냥 보기 싫은거 간단하게 css 입혀놓은 것임 #}
+    {% if request.session.mem_no  == cont.mem_no.pk %} {# 로그인 한 사람이면 삭제버튼 구현, 여기서 세션과 현재 로그인한 사람이 같으면 #}
+        <button type="button" onclick="return confirm('정말 삭제하시겠습니까?')">
+                <!-- onclick 에 return confirm 을 걸어줄 수도 있음. 삭제 확인-->
+                <a href="{% url 'board-delete' board_no=cont.board_no %}" style="text-decoration: none; color: black">삭제</a>
+        </button>
+
+        <button type="button" onclick="return confirm('수정하시겠습니까?')">
+            <a href="{% url 'board-update' board_no=cont.board_no %}" style="text-decoration: none; color: black">수정</a>
+        </button>
+
+    {% elif admin == 0 %} {# 혹여나 관리자로 로그인을 했을 경우, 삭제버튼 전부 보여준다. 관리자는 0으로 받았기 때문에 검색 가능 #}
+        <button type="button" onclick="return confirm('정말 삭제하시겠습니까?')">
+                <!-- onclick 에 return confirm 을 걸어줄 수도 있음. 삭제 확인-->
+                <a href="{% url 'board-delete' board_no=cont.board_no %}" style="text-decoration: none; color: black">삭제</a>
+        </button>
+    {% endif %}
+    <br>
+{% endfor %}
+
+<form action="{% url 'board' %}" method="POST"> <!-- 글쓰기 버튼이다. -->
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }} <!-- form을 들고옴 -->
+        <input type="hidden" name="mem_no" value="{{ loginMem }}">
+        <!-- 위에 있는 input을 안쓰면 mem_no 가 hiddenInput으로 넘어가지 않는다 -->
+        <tr>
+            <th>{% if member == 0 or admin == 0  %} <!-- 로그인을 한 사람이나 관리자만 글을 쓸 수 있다 -->
+                <input type="submit" value="글쓰기">
+                {% endif %}
+            </th>
+        </tr>
+    </table>
+</form>
+
+<!-- 밑에는 페이지 나눠놓은 코드임 -->
+<span>
+        {% if content.has_previous %}
+            <!-- 현재 페이지, 전 페이지가 있는지 리턴해주는 함수 -->
+            <a href="?page=1">&laquo;</a>
+            <a href="?page={{ content.previous_page_number }}"> {{ content.previous_page_number }}</a>
+        {% endif %}
+
+    <span>
+        {{ content.number }}
+    </span>
+
+    <span>
+        {% if content.has_next %}
+            <a href="?page={{ content.next_page_number }}"> {{ content.next_page_number }}</a>
+            <a href="?page={{ content.paginator.num_pages }}">&raquo;</a>
+        {% endif %}
+    </span>
+    </span>
+<br><a href="{% url 'main' %}">
+    <button type="button">뒤로가기</button>
+</a>
+</body>
+</html>

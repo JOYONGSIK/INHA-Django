@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="{% url 'signup' %}" method="POST">
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }} {# 회원가입하는 form을 가져온다. forms.py에서 signUpForm을 가져옴. #}
+        {% if not_signUp == 0 %} {# 유효하지 않을경우(오류가 나올경우)를 방지해서 넣어둔 코드, #}
+            {# views.py에서 64번째줄. 혹여나 가입을 눌렀을 때 잘못될 경우를 방지하기 위함이다. #}
+            <script>alert('회원가입을 할 수 없습니다. 다시 입력해주세요.')</script>
+        {% endif %}
+        <tr>
+            <th>
+                <input type="submit" value="회원가입"> {# 버튼 누르면 넘어간다. POST 방식으로 #}
+                <a href="{% url 'main' %}"><button type="button">뒤로가기</button></a> {# 단순 뒤로가기 버튼 #}
+            </th>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

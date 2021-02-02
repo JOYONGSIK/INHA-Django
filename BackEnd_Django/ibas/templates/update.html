@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+{# update.html의 경우 두가지로 나눠져있음 ////// 게시판글을 수정하는 form  ///// 댓글을 수정하는 form #}
+{# 게시판을 수정할 경우 board_update == 0 일 경우만 forms.py에서 Board를 보여준다. #}
+{# 댓글을 수정할 경우 review_update == 0 일 경우만 forms.py에서 review를 보여준다. #}
+
+{% if board_update == 0 %} {# 게시판 수정 코드 #}
+    <form action="{% url 'board-update' board_no=board_no %}" method="POST"> {# 파라미터 하나 필요. urls.py 13번째 줄에서 확인 가능 #}
+        {% csrf_token %}
+        <table>
+            {{ form.as_table }} {# forms.py에서 Board를 가져온다. #}
+            <input type="hidden" name="mem_no" value="{{ loginMem }}"> {# inputHidden으로 인해서 현재 세션에 있는 회원번호를 넘겨준다. #}
+            <tr>
+                <th>
+                    <input type="submit" value="수정하기"> {# 누르면 POST #}
+                    <a href="{% url 'board' %}"> {# 뒤로가기 버튼 #}
+                        <button type="button">뒤로가기</button>
+                    </a>
+                </th>
+            </tr>
+        </table>
+    </form>
+{% endif %}
+
+{% if review_update == 0 %} {# 댓글 수정 코드 #}
+    <form action="{% url 'review_update' board_name=board_name board_no=board_no review_no=review_no %}" method="POST">
+    {# 댓글의 경우 urls.py 17번째줄을 보면 파라미터로 3개를 받는 것을 알 수 있다. board_name도 받고있음 착각할 수 있으니 조심. #}
+    {% csrf_token %}
+        <table>
+             {{ form.as_table }} {#  댓글수정하는 form을 보여줌. review를 보여준다. #}
+        </table>
+        <input type="submit" value="댓글 쓰기">
+        <input type="hidden" name="board_no" value='{{ board_no }}'> {# inputHidden으로 인해서 게시글 번호를 넘겨준다. #}
+        <input type="hidden" name="mem_no" value='{{ loginMem }}'> {# inputHidden으로 인해서 현재 세션에 있는 회원번호를 넘겨준다. #}
+        <a href="{% url 'board' %}">
+            <button type="button">게시판으로가기</button> {# 게시판으로 돌아가는 버튼 #}
+         </a>
+    </form>
+{% endif %}
+</body>
+</html>
